@@ -1,0 +1,25 @@
+{
+  "name": "@dashtyad/server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node ./src/server.ts",
+    "start": "nodemon ./dist/server.js",
+    "prod": "npm run build && npm run start"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.8",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.6",
+    "nodemon": "^2.0.4",
+    "ts-node": "^9.0.0",
+    "ts-node-dev": "^1.0.0-pre.58",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
