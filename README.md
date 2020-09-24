@@ -1,5 +1,5 @@
 # dashtyad
-## install package :
+## install packages :
 ```console
 foo@bar:~$ lerna bootstrap
 ```
