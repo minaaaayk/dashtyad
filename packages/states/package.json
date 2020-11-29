@@ -1,5 +1,5 @@
 {
-  "name": "@satek/states",
+  "name": "@dashtyad/states",
   "version": "0.0.1",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -9,10 +9,6 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.4.0",
-    "@satek/resolvers": "^0.0.1",
-    "graphql": "^15.3.0",
-    "graphql-request": "^3.1.0",
-    "lodash": "^4.17.20",
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0"
   },
