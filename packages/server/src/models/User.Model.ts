@@ -1,4 +1,5 @@
-import { prop, getModelForClass } from "@typegoose/typegoose";
+import { NoteBook } from "./NoteBook.model";
+import { prop, getModelForClass, Ref } from "@typegoose/typegoose";
 import { Gender } from "../Shared/interfaces/IUser";
 
 export class User {
@@ -22,6 +23,9 @@ export class User {
 
   @prop({ enum: Gender, type: Number, default: Gender.unknown })
   public gender?: Gender;
+
+  @prop({ ref: () => NoteBook })
+  public notebooks?: Ref<NoteBook>[];
 }
 
 export const UserModel = getModelForClass(User); // UserModel is a regular Mongoose Model with correct types
