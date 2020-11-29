@@ -1,5 +1,6 @@
+import { UserModel } from "./../models/User.Model";
+import { IUser } from "./../Shared/interfaces/IUser";
 import { Request, Response } from "express";
-import User, { IUser } from "../models/User.Model";
 
 const login_post = (req: Request, res: Response) => {
   res.status(200).send({
@@ -27,18 +28,17 @@ const register_post = (req: Request, res: Response) => {
       firstName,
       lastName,
       username,
-      gender,
     } = req.body as IUser;
 
-    const user = User.create({
+    UserModel.create({
       email,
       password,
       firstName,
       lastName,
       username,
-      gender,
+      createAt: new Date(),
     })
-      .then((user: IUser) => {
+      .then((user) => {
         res.status(200).send({
           message: "POST register  OK",
           user,

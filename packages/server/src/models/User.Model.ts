@@ -1,41 +1,27 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { prop, getModelForClass } from "@typegoose/typegoose";
+import { Gender } from "../Shared/interfaces/IUser";
 
-export enum Gender {
-  male = 'male',
-  female = 'female',
-  undisclosed = 'undisclosed'
+export class User {
+  @prop({ required: true, unique: true })
+  public email!: string;
+
+  @prop()
+  public firstName?: string;
+
+  @prop()
+  public lastName?: string;
+
+  @prop({ required: true, unique: true, index: true })
+  public username!: string;
+
+  @prop({ required: true })
+  public password: string;
+
+  @prop({ required: true })
+  public createAt: Date;
+
+  @prop({ enum: Gender, type: Number, default: Gender.unknown })
+  public gender?: Gender;
 }
 
-export interface Address extends Document {
-  street: string;
-  city: string;
-  postCode: string;
-}
-
-export interface IUser extends Document {
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  username: string;
-  password:string;
-  gender?: Gender;
- // address?: Address;
-}
-
-const UserSchema: Schema = new Schema({
-  email: { type: String, required: true, unique: true },
-  firstName: { type: String},
-  lastName: { type: String},
-  username: { type: String, required: true },
-  password: { type: String, required: true },
-  // Gets the Mongoose enum from the TypeScript enum
-  gender: { type: String, enum: Object.values(Gender) },
-  // address: {
-  //   street: { type: String },
-  //   city: { type: String },
-  //   postCode: { type: String }
-  // }
-});
-
-// Export the model and return your IUser interface
-export default mongoose.model<IUser>('User', UserSchema);
+export const UserModel = getModelForClass(User); // UserModel is a regular Mongoose Model with correct types

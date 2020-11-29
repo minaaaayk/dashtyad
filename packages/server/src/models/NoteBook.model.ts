@@ -1,15 +1,14 @@
-import mongoose, { Schema, Document } from 'mongoose';
-import { IUser } from './User.Model';
+import { User } from "./User.Model";
+import { prop, getModelForClass, Ref } from "@typegoose/typegoose";
 
-export interface IPet extends Document {
-  name: string;
-  owner: IUser['_id'];
+export class NoteBook {
+  @prop({ required: true, unique: true })
+  public name?: string;
+
+  @prop({ required: true })
+  public createAt: Date;
+
+  @prop({ ref: () => User })
+  public owner: Ref<User>;
 }
-
-const NoteBookSchema: Schema = new Schema({
-  name: { type: String, required: true },
-  createAt :{ type: Date, required: true },
-  owner: { type: Schema.Types.ObjectId, required: true }
-});
-
-export default mongoose.model<IPet>('NoteBook', NoteBookSchema);
+export const NoteBookModel = getModelForClass(NoteBook); // UserModel is a regular Mongoose Model with correct types
