@@ -6,7 +6,7 @@ const Create_NoteBook = (req: Request, res: Response) => {};
 const Delete_NoteBook = (req: Request, res: Response) => {};
 const Update_NoteBook = (req: Request, res: Response) => {};
 
-export const UserController = {
+export const NoteBookController = {
   get_All_NoteBooks,
   get_A_NoteBook,
   Create_NoteBook,

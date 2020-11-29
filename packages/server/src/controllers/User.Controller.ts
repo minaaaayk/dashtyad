@@ -1,61 +1,32 @@
-import { UserModel } from "./../models/User.Model";
-import { IUser } from "./../Shared/interfaces/IUser";
 import { Request, Response } from "express";
 
-const login_post = (req: Request, res: Response) => {
+const get_One_User = (req: Request, res: Response) => {
   res.status(200).send({
-    message: "GET login",
+    message: "GET ONe User",
   });
 };
 
-const login_get = (req: Request, res: Response) => {
+const get_All_Users = (req: Request, res: Response) => {
   res.status(200).send({
-    message: "POST login",
+    message: "GET All User",
   });
 };
 
-const register_get = (req: Request, res: Response) => {
+const delete_One_User = (req: Request, res: Response) => {
   res.status(200).send({
-    message: "GET register",
+    message: "delete on User",
   });
 };
 
-const register_post = (req: Request, res: Response) => {
-  if (req.query) {
-    const {
-      email,
-      password,
-      firstName,
-      lastName,
-      username,
-    } = req.body as IUser;
-
-    UserModel.create({
-      email,
-      password,
-      firstName,
-      lastName,
-      username,
-      createAt: new Date(),
-    })
-      .then((user) => {
-        res.status(200).send({
-          message: "POST register  OK",
-          user,
-        });
-      })
-      .catch((error: Error) => {
-        res.status(400).send({
-          message: "POST register  Failed",
-          error,
-        });
-      });
-  }
+const Update_One_User = (req: Request, res: Response) => {
+  res.status(200).send({
+    message: "update User",
+  });
 };
 
 export const UserController = {
-  register_post,
-  register_get,
-  login_post,
-  login_get,
+  get_One_User,
+  get_All_Users,
+  delete_One_User,
+  Update_One_User,
 };
