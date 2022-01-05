@@ -9,10 +9,10 @@ export class NoteBook {
   @prop({ required: true })
   public createAt: Date;
 
-  @prop({ ref: () => User })
+  @prop({ ref: 'User' })
   public owner: Ref<User>;
 
-  @prop({ ref: () => Note })
+  @prop({ required: false,  ref: () => Note, default: [] })
   public notes?: Ref<Note>[];
 }
 export const NoteBookModel = getModelForClass(NoteBook); // UserModel is a regular Mongoose Model with correct types

@@ -24,7 +24,7 @@ export class User {
   @prop({ enum: Gender, type: Number, default: Gender.unknown })
   public gender?: Gender;
 
-  @prop({ ref: () => NoteBook })
+  @prop({ required: false, ref: () => NoteBook, default: [] })
   public notebooks?: Ref<NoteBook>[];
 }
 

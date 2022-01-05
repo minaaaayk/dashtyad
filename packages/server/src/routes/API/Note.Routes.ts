@@ -6,7 +6,7 @@ export const NoteRouter = (app: Application) => {
   const Parser = bodyParser.json();
   app.route("/notes").get(Parser, NoteController.get_All_Notes);
   app
-    .route("/user")
+    .route("/note")
     .get(Parser, NoteController.get_A_Note)
     .post(Parser, NoteController.Create_Note)
     .put(Parser, NoteController.Update_Note)

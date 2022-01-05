@@ -26,10 +26,10 @@ export class Note {
   @prop({ type: () => [Task] })
   public tasks?: Task[];
 
-  @prop({ ref: () => NoteBook })
-  public notebook: Ref<NoteBook>;
+  @prop({ ref: 'NoteBook' })
+  public notebook?: Ref<NoteBook>;
 
-  @prop({ ref: () => User })
+  @prop({ ref: 'User' })
   public owner: Ref<User>;
 }
 export const NoteModel = getModelForClass(Note); // UserModel is a regular Mongoose Model with correct types

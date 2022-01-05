@@ -2,9 +2,10 @@ import { NoteRouter } from "./API/Note.Routes";
 import { NoteBookRouter } from "./API/NoteBook.Routes";
 import { Application, Request, Response } from "express";
 import { UserRouter } from "./API/User.Routes";
+import { AuthRouter } from "./API/Auth.Routes";
 
 export const router = (app: Application) => {
-  // CrmRouter(app);
+  AuthRouter(app);
   UserRouter(app);
   NoteBookRouter(app);
   NoteRouter(app);
