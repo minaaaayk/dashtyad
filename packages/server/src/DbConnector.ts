@@ -8,7 +8,6 @@ export default (dbURL: string) => {
       .connect(dbURL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-        useCreateIndex: true,
       })
       .then(() => {
         return console.info(`Successfully connected to ${dbURL}`);
