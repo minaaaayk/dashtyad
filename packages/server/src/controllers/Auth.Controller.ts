@@ -1,6 +1,5 @@
-import { UserModel } from "./../models/User.Model";
-import { IUser } from "./../Shared/interfaces/IUser";
-import { request, Request, Response } from "express";
+import { User, UserModel, UserType } from "./../models/User.Model";
+import { Request, Response } from "express";
 
 const login = (req: Request, res: Response) => {
   res.status(200).send({
@@ -8,26 +7,28 @@ const login = (req: Request, res: Response) => {
   });
 };
 
+
 const register = (req: Request, res: Response) => {
   if (req.body) {
     try{
-
+      
       const {
         email,
         password,
         firstName,
         lastName,
         username,
-      } = req.body as IUser; 
-  
-      UserModel.create({
-        email,
-        password,
-        firstName,
-        lastName,
-        username,
-        createAt: new Date(),
-      })
+      } = req.body as UserType; 
+
+      User.hashPassword(password).then((hashPass)=>{
+        UserModel.create({
+          email,
+          password: hashPass,
+          firstName,
+          lastName,
+          username,
+          createAt: new Date(),
+        })
         .then((user) => {
           res.status(200).send({
             message: "POST register  OK",
@@ -40,17 +41,27 @@ const register = (req: Request, res: Response) => {
             error,
           });
         });
+      }).catch(err => {
+        throw new Error(err)
+      });
     }
-   catch (error) {
+    catch (error) {
       res.status(400).send({
-              message: "invalid data",
-              error,
+        message: "Registration Problem",
+        error,
       });
     }
   }
 };
 
+const changePassword = (req: Request, res: Response)=>{
+  res.status(200).send({
+    message: "change password",
+  });
+};
+
 export const AuthController = {
   register,
   login,
+  changePassword,
 };

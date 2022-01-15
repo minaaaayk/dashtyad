@@ -1,6 +1,7 @@
 import { User } from "./User.Model";
 import { NoteBook } from "./NoteBook.model";
 import { prop, getModelForClass, Ref } from "@typegoose/typegoose";
+import { InstanceType} from "typegoose";
 
 export class Task {
   @prop({ required: true })
@@ -33,3 +34,4 @@ export class Note {
   public owner: Ref<User>;
 }
 export const NoteModel = getModelForClass(Note); // UserModel is a regular Mongoose Model with correct types
+export type NoteType = InstanceType<Note>;

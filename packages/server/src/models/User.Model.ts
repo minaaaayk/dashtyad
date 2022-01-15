@@ -1,8 +1,27 @@
 import { NoteBook } from "./NoteBook.model";
-import { prop, getModelForClass, Ref } from "@typegoose/typegoose";
-import { Gender } from "../Shared/interfaces/IUser";
+import { prop, getModelForClass, Ref, } from "@typegoose/typegoose";
+import { staticMethod , InstanceType} from "typegoose"
+import * as bcrypt from "bcryptjs";
 
-export class User {
+export interface Credentials {
+    username: string;
+    password: string;
+}
+
+export enum Gender {
+  male = 1,
+  female = 2,
+  unknown = 3,
+}
+
+
+export enum Role {
+    Admin    = 'ADMIN',
+    Guest    = 'GUEST',
+    Regular  = 'REGULAR'
+}
+
+export class User implements Credentials {
   @prop({ required: true, unique: true })
   public email!: string;
 
@@ -21,11 +40,46 @@ export class User {
   @prop({ required: true })
   public createAt: Date;
 
+
+  @prop({ required: false })
+  public updateAt?: Date;
+
+  @prop({required: false, default: Role.Regular})
+  public role: Role;
+
   @prop({ enum: Gender, type: Number, default: Gender.unknown })
   public gender?: Gender;
 
   @prop({ required: false, ref: () => NoteBook, default: [] })
   public notebooks?: Ref<NoteBook>[];
+
+
+  @staticMethod
+  public static hashPassword( unEncryptedPassword: string | number): Promise<String> {
+    return bcrypt.hash( String(unEncryptedPassword), 8);
+  }
+
+  @staticMethod
+  public static checkIfUnEncryptedPasswordIsValid(
+        encryptedPassword: string,
+        unEncryptedPassword: string
+    ): Promise<boolean> {
+    return bcrypt.compare(unEncryptedPassword, encryptedPassword);
+  }
+
+   @staticMethod
+    static async findByCredentials({ username, password }: Credentials ) {
+      let hashedPassword = "";
+      this.hashPassword(password).then((hashPass)=>{
+        hashedPassword = String(hashPass);
+      });
+
+      return UserModel.findOne({
+            username, 
+            password: hashedPassword, 
+        });
+    }
 }
 
 export const UserModel = getModelForClass(User); // UserModel is a regular Mongoose Model with correct types
+export type UserType = InstanceType<User>;
