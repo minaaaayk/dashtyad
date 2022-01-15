@@ -1,10 +1,14 @@
 import { UserController } from "../../controllers/User.Controller";
 import { Application } from "express";
+import { checkJwt } from "../../middlewares/checkJwt";
+import { checkRole } from "../../middlewares/checkRole";
+import { Role } from "../../models/User.Model";
 
 export const UserRouter = (app: Application) => {
+  app.get("/users", [checkJwt, checkRole([Role.Admin])], UserController.get_All_Users);  
   app
-    .route("/user")
-    .get(UserController.get_One_User)
-    .put(UserController.Update_One_User)
-    .delete(UserController.delete_One_User);
+  .route("/user/:id([0-9]+)")
+    .get([checkJwt],UserController.get_One_User) 
+    .put([checkJwt], UserController.Update_One_User)
+    .delete([checkJwt], UserController.delete_One_User);
 };
