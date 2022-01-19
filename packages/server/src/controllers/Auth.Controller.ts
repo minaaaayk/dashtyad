@@ -1,10 +1,48 @@
 import { User, UserModel, UserType } from "./../models/User.Model";
-import { Request, Response } from "express";
+import { request, Request, Response } from "express";
+import * as jwt from "jsonwebtoken";
+import config from "../config/config";
 
 const login = (req: Request, res: Response) => {
-  res.status(200).send({
-    message: "login",
-  });
+
+   if (req.body) {
+    try{
+      const {
+        password,
+        username,
+      } = req.body as UserType; 
+
+      User.findByCredentials({ password ,username })
+      .then((user) => {
+          //Sing JWT, valid for 1 hour
+        const token = jwt.sign(
+          { userId: user.id, username: user.username },
+          config.jwtSecret,
+          { expiresIn: "1h" }
+        );
+
+        res.setHeader("token", token);
+        res.status(200)
+        .send({
+          message: "login  OK",
+          user,
+          token,
+        });
+      })
+      .catch((error: Error) => {
+        res.status(409).send({
+          message: "login  Failed",
+          error,
+        });
+      });
+    }
+    catch (error) {
+      res.status(400).send({
+        message: "Registration Problem",
+        error,
+      });
+    }
+  }
 };
 
 
@@ -30,14 +68,24 @@ const register = (req: Request, res: Response) => {
           createAt: new Date(),
         })
         .then((user) => {
-          res.status(200).send({
-            message: "POST register  OK",
+           //Sing JWT, valid for 1 hour
+          const token = jwt.sign(
+            { userId: user.id, username: user.username },
+            config.jwtSecret,
+            { expiresIn: "1h" }
+          );
+
+          res.setHeader("token", token);
+          res.status(200)
+          .send({
+            message: "register  OK",
             user,
+            token,
           });
         })
         .catch((error: Error) => {
-          res.status(400).send({
-            message: "POST register  Failed",
+          res.status(409).send({
+            message: "register  Failed",
             error,
           });
         });
