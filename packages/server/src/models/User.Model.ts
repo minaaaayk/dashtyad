@@ -59,25 +59,16 @@ export class User implements Credentials {
     return bcrypt.hash( String(unEncryptedPassword), 8);
   }
 
-  @staticMethod
-  public static checkIfUnEncryptedPasswordIsValid(
-        encryptedPassword: string,
-        unEncryptedPassword: string
-    ): Promise<boolean> {
-    return bcrypt.compare(unEncryptedPassword, encryptedPassword);
-  }
 
    @staticMethod
     static async findByCredentials({ username, password }: Credentials ) {
-      let hashedPassword = "";
-      this.hashPassword(password).then((hashPass)=>{
-        hashedPassword = String(hashPass);
-      });
-
-      return UserModel.findOne({
+      const hashedPassword = await this.hashPassword(password)
+      .then((hashPass)=> String(hashPass));
+      return UserModel.findOne({ where: {
             username, 
             password: hashedPassword, 
-        });
+        }});
+
     }
 }
 
