@@ -38,7 +38,7 @@ const login = (req: Request, res: Response) => {
     }
     catch (error) {
       res.status(400).send({
-        message: "Registration Problem",
+        message: "login Problem",
         error,
       });
     }
@@ -49,6 +49,7 @@ const login = (req: Request, res: Response) => {
 const register = (req: Request, res: Response) => {
   if (req.body) {
     try{
+      console.log('reg: ', req.body);
       
       const {
         email,
@@ -68,6 +69,7 @@ const register = (req: Request, res: Response) => {
           createAt: new Date(),
         })
         .then((user) => {
+          
            //Sing JWT, valid for 1 hour
           const token = jwt.sign(
             { userId: user.id, username: user.username },
@@ -103,9 +105,40 @@ const register = (req: Request, res: Response) => {
 };
 
 const changePassword = (req: Request, res: Response)=>{
-  res.status(200).send({
-    message: "change password",
-  });
+  if (req.body) {
+
+    // TODO: need to fix
+    try{
+      const {
+        oldPassword, newPassword
+      } = req.body; 
+
+      //Get ID from JWT
+      const id = res.locals.jwtPayload.userId;
+      console.log("id: ", id);
+      
+      UserModel.findOne(id)
+      .then((user) => {
+        res.status(200)
+        .send({
+          message: "pass  OK",
+          user,
+        });
+      })
+      .catch((error: Error) => {
+        res.status(409).send({
+          message: "user not found",
+          error,
+        });
+      });
+    }
+    catch (error) {
+      res.status(400).send({
+        message: "changing password problem",
+        error,
+      });
+    }
+  }
 };
 
 export const AuthController = {
