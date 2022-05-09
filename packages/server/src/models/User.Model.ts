@@ -62,12 +62,12 @@ export class User implements Credentials {
 
    @staticMethod
     static async findByCredentials({ username, password }: Credentials ) {
-      const hashedPassword = await this.hashPassword(password)
-      .then((hashPass)=> String(hashPass));
-      return UserModel.findOne({ where: {
-            username, 
-            password: hashedPassword, 
-        }});
+      const user = await UserModel.findOne({  username  });
+      const match = await bcrypt.compare(password, user?.password);
+      if(match)
+        return user;
+      else
+        throw new ErrorEvent('');
 
     }
 }
