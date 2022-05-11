@@ -3,7 +3,7 @@ import { request, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import config from "../config/config";
 
-const login = (req: Request, res: Response) => {
+const login = async (req: Request, res: Response) => {
 
    if (req.body) {
     try{
@@ -12,9 +12,9 @@ const login = (req: Request, res: Response) => {
         username,
       } = req.body as UserType; 
 
-      User.findByCredentials({ password ,username })
-      .then((user) => {
-          //Sing JWT, valid for 1 hour
+      try {
+        const user = await User.findByCredentials({ password ,username });
+        //Sing JWT, valid for 1 hour
         const token = jwt.sign(
           { userId: user.id, username: user.username },
           config.jwtSecret,
@@ -28,17 +28,17 @@ const login = (req: Request, res: Response) => {
           user,
           token,
         });
-      })
-      .catch((error: Error) => {
+
+      } catch (error) {
         res.status(409).send({
           message: "login  Failed",
           error,
         });
-      });
+      }
     }
     catch (error) {
       res.status(400).send({
-        message: "login Problem",
+        message: "invalid Arguments",
         error,
       });
     }
@@ -104,7 +104,7 @@ const register = (req: Request, res: Response) => {
   }
 };
 
-const changePassword = (req: Request, res: Response)=>{
+const changePassword = async (req: Request, res: Response)=>{
   if (req.body) {
 
     // TODO: need to fix
@@ -116,21 +116,34 @@ const changePassword = (req: Request, res: Response)=>{
       //Get ID from JWT
       const id = res.locals.jwtPayload.userId;
       console.log("id: ", id);
-      
-      UserModel.findOne(id)
-      .then((user) => {
+      try {
+        const user = await UserModel.findOne({ _id : id});
+        //Check if old password matchs
+        const matched = await User.checkPassword({
+          unEncryptedPassword: oldPassword,
+          encryptedPassword: user.password
+        });
+        if (!matched) {
+          res.status(401).send({
+            message: 'password is not matched',
+          });
+          return;
+        }
+        const hashedPassword = await User.hashPassword(newPassword);
+        user.password = hashedPassword;
+        user.save();
         res.status(200)
         .send({
           message: "pass  OK",
           user,
         });
-      })
-      .catch((error: Error) => {
+        
+      } catch (error) {
         res.status(409).send({
           message: "user not found",
           error,
         });
-      });
+      }
     }
     catch (error) {
       res.status(400).send({
