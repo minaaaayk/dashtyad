@@ -4,7 +4,8 @@ import { staticMethod , InstanceType} from "typegoose"
 import * as bcrypt from "bcryptjs";
 
 export interface Credentials {
-    username: string;
+    username?: string;
+    email?: string;
     password: string;
 }
 
@@ -71,8 +72,10 @@ export class User implements Credentials {
   }
 
    @staticMethod
-    static async findByCredentials({ username, password }: Credentials ) {
-      const user = await UserModel.findOne({  username  });
+    static async findByCredentials({ username, password, email }: Credentials ) {
+      const user = await UserModel.findOne({  username  }) 
+                || await UserModel.findOne({  email  });
+
       const match = await this.checkPassword(
           {
             unEncryptedPassword :password,

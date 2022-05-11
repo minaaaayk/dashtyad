@@ -9,11 +9,12 @@ const login = async (req: Request, res: Response) => {
     try{
       const {
         password,
+        email,
         username,
       } = req.body as UserType; 
 
       try {
-        const user = await User.findByCredentials({ password ,username });
+        const user = await User.findByCredentials({ password ,username, email });
         //Sing JWT, valid for 1 hour
         const token = jwt.sign(
           { userId: user.id, username: user.username },
@@ -58,6 +59,7 @@ const register = async (req: Request, res: Response) => {
       } = req.body as UserType;
       
       try {
+        
         const hashedPassword =  await User.hashPassword(password);
         const user = await UserModel.create({
           email,
