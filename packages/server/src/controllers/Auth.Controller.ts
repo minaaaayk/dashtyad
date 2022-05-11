@@ -1,5 +1,5 @@
 import { User, UserModel, UserType } from "./../models";
-import { request, Request, Response } from "express";
+import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import config from "../config/config";
 
@@ -46,31 +46,28 @@ const login = async (req: Request, res: Response) => {
 };
 
 
-const register = (req: Request, res: Response) => {
+const register = async (req: Request, res: Response) => {
   if (req.body) {
     try{
-      console.log('reg: ', req.body);
-      
       const {
         email,
         password,
         firstName,
         lastName,
         username,
-      } = req.body as UserType; 
-
-      User.hashPassword(password).then((hashPass)=>{
-        UserModel.create({
+      } = req.body as UserType;
+      
+      try {
+        const hashedPassword =  await User.hashPassword(password);
+        const user = await UserModel.create({
           email,
-          password: hashPass,
+          password: hashedPassword,
           firstName,
           lastName,
           username,
           createAt: new Date(),
-        })
-        .then((user) => {
-          
-           //Sing JWT, valid for 1 hour
+        });
+         //Sing JWT, valid for 1 hour
           const token = jwt.sign(
             { userId: user.id, username: user.username },
             config.jwtSecret,
@@ -84,20 +81,17 @@ const register = (req: Request, res: Response) => {
             user,
             token,
           });
-        })
-        .catch((error: Error) => {
-          res.status(409).send({
+          return;
+      } catch (error) {
+        res.status(409).send({
             message: "register  Failed",
             error,
           });
-        });
-      }).catch(err => {
-        throw new Error(err)
-      });
+      }
     }
     catch (error) {
       res.status(400).send({
-        message: "Registration Problem",
+        message: "Invalid arguments",
         error,
       });
     }
@@ -115,7 +109,6 @@ const changePassword = async (req: Request, res: Response)=>{
 
       //Get ID from JWT
       const id = res.locals.jwtPayload.userId;
-      console.log("id: ", id);
       try {
         const user = await UserModel.findOne({ _id : id});
         //Check if old password matchs
