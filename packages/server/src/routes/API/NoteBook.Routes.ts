@@ -1,5 +1,4 @@
-import { NoteController } from "./../../controllers/Note.Controller";
-import { NoteBookController } from "./../../controllers/NoteBook.Controller";
+import { NoteController, NoteBookController } from "./../../controllers";
 import { Application } from "express";
 
 export const NoteBookRouter = (app: Application) => {

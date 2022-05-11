@@ -1,4 +1,4 @@
-import { NoteController } from "./../../controllers/Note.Controller";
+import { NoteController } from "./../../controllers";
 import { Application } from "express";
 
 export const NoteRouter = (app: Application) => {

@@ -1,4 +1,4 @@
-import { User, UserModel, UserType } from "./../models/User.Model";
+import { User, UserModel, UserType } from "./../models";
 import { request, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
 import config from "../config/config";

@@ -1,8 +1,7 @@
-import { UserController } from "../../controllers/User.Controller";
+import { UserController } from "../../controllers";
 import { Application } from "express";
-import { checkJwt } from "../../middlewares/checkJwt";
-import { checkRole } from "../../middlewares/checkRole";
-import { Role } from "../../models/User.Model";
+import { checkJwt, checkRole } from "../../middlewares";
+import { Role } from "../../models";
 
 export const UserRouter = (app: Application) => {
   app.get("/users", [checkJwt, checkRole([Role.Admin])], UserController.get_All_Users);  

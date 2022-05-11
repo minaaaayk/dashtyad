@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { UserModel } from "./../models/User.Model";
+import { UserModel } from "./../models";
 
 
 export const checkRole = (roles: Array<string>) => {
