@@ -8,6 +8,11 @@ export interface Credentials {
     password: string;
 }
 
+interface ICheckPassword {
+    unEncryptedPassword: string ,
+    encryptedPassword:  string,
+}
+
 export enum Gender {
   male = 1,
   female = 2,
@@ -55,15 +60,24 @@ export class User implements Credentials {
 
 
   @staticMethod
-  public static hashPassword( unEncryptedPassword: string | number): Promise<String> {
+  public static hashPassword( unEncryptedPassword: string | number): Promise<string> {
     return bcrypt.hash( String(unEncryptedPassword), 8);
   }
 
+  @staticMethod
+  public  static async checkPassword(
+      { unEncryptedPassword, encryptedPassword } :ICheckPassword ){
+    return bcrypt.compare(unEncryptedPassword, encryptedPassword);
+  }
 
    @staticMethod
     static async findByCredentials({ username, password }: Credentials ) {
       const user = await UserModel.findOne({  username  });
-      const match = await bcrypt.compare(password, user?.password);
+      const match = await this.checkPassword(
+          {
+            unEncryptedPassword :password,
+            encryptedPassword: user?.password
+          });
       if(match)
         return user;
       else
