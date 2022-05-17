@@ -1,30 +1,51 @@
 import { Request, Response, NextFunction } from "express";
-import * as jwt from "jsonwebtoken";
-import config from "../config/config";
+import { IResponseType } from "../Shared";
+import { jwtServices } from "../services";
 
-export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
+export const checkJwt = async (req: Request, res: Response, next: NextFunction) => {
   //Get the jwt token from the head
-  const token = <string>req.headers["auth"];
-  let jwtPayload;
-
+  const data = {
+    refreshToken: req.headers['refresh-token'],
+    accessToken: req.headers['access-token'],
+  };
   //Try to validate the token and get data
   try {
-    jwtPayload = <any>jwt.verify(token, config.jwtSecret);
-    res.locals.jwtPayload = jwtPayload;
-  } catch (error) {
-    //If token is not valid, respond with 401 (unauthorized)
-    res.status(401).send();
-    return;
+    const { expired, match, tokens , user } =  await jwtServices(data);
+    if (expired) {
+      const expiredResponse: IResponseType = {
+        prettyMessage: 'Please log in again',
+        status: 405,
+        success: false,
+      };
+      res.status(expiredResponse.status);
+      res.send(expiredResponse);
+      return;
+    }
+      //If token is not valid, respond with 401 (unauthorized)
+    if (!match) {
+      const badRequest: IResponseType = {
+        prettyMessage: 'Invalid Token',
+        status: 401,
+        success: false,
+      };
+      res.status(badRequest.status);
+      res.send(badRequest);
+      return;
+    } 
+    res.setHeader("refresh-token", tokens.refreshToken);
+    res.setHeader("access-token", tokens.accessToken);
+    res.locals.jwtPayload = {...tokens, ...user};
+
+  } catch (err) {
+    const response: IResponseType = {
+      prettyMessage: 'Internal Server Error.',
+      status: 501,
+      success: false,
+    };
+
+    res.status(response.status);
+    res.send(response);
   }
-
-  //The token is valid for 1 hour
-  //We want to send a new token on every request
-  const { userId, username } = jwtPayload;
-  const newToken = jwt.sign({ userId, username }, config.jwtSecret, {
-    expiresIn: "1h"
-  });
-  res.setHeader("token", newToken);
-
   //Call the next middleware or controller
   next();
 };
