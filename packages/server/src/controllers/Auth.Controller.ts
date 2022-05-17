@@ -1,10 +1,11 @@
 import { User, UserModel, UserType } from "./../models";
+import {registerUserService} from "../services"
 import { Request, Response } from "express";
-import * as jwt from "jsonwebtoken";
-import config from "../config/config";
+import { jwtHelpers, redisHelpers } from "../helpers";
 
 const login = async (req: Request, res: Response) => {
 
+  
    if (req.body) {
     try{
       const {
@@ -16,18 +17,22 @@ const login = async (req: Request, res: Response) => {
       try {
         const user = await User.findByCredentials({ password ,username, email });
         //Sing JWT, valid for 1 hour
-        const token = jwt.sign(
-          { userId: user.id, username: user.username },
-          config.jwtSecret,
-          { expiresIn: "1h" }
-        );
+       // Generating access & refresh token ( JWT )
+       const accessToken = await jwtHelpers.generateAccessToken({userId: user.id, username: username || email });
+       const refreshToken = await jwtHelpers.generateRefreshToken({userId: user.id, username: username || email });
+       
+       // Saving refreshToken in redisDB
+       
+       await redisHelpers.SET(user.id, refreshToken);
+        res.setHeader("refresh-token", refreshToken);
+        res.setHeader("access-token", accessToken);
 
-        res.setHeader("token", token);
         res.status(200)
         .send({
           message: "login  OK",
           user,
-          token,
+          accessToken,
+          refreshToken,
         });
 
       } catch (error) {
@@ -50,44 +55,33 @@ const login = async (req: Request, res: Response) => {
 const register = async (req: Request, res: Response) => {
   if (req.body) {
     try{
-      const {
-        email,
-        password,
-        firstName,
-        lastName,
-        username,
-      } = req.body as UserType;
+      const { email, username } = req.body as UserType;
       
       try {
-        
-        const hashedPassword =  await User.hashPassword(password);
-        const user = await UserModel.create({
-          email,
-          password: hashedPassword,
-          firstName,
-          lastName,
-          username,
-          createAt: new Date(),
-        });
-         //Sing JWT, valid for 1 hour
-          const token = jwt.sign(
-            { userId: user.id, username: user.username },
-            config.jwtSecret,
-            { expiresIn: "1h" }
-          );
-
-          res.setHeader("token", token);
+        const existUser = await UserModel.findOne({  username  }) 
+                || await UserModel.findOne({  email  }); 
+        if(existUser){
+          throw (new Error('User already registered'));
+        }
+        const {
+            accessToken,
+            user,
+            refreshToken,
+          } = await registerUserService(req.body);
+          res.setHeader("refresh-token", refreshToken);
+          res.setHeader("access-token", accessToken);
           res.status(200)
           .send({
             message: "register  OK",
             user,
-            token,
+            accessToken,
+            refreshToken,
           });
           return;
       } catch (error) {
         res.status(409).send({
             message: "register  Failed",
-            error,
+            error: error.message,
           });
       }
     }
