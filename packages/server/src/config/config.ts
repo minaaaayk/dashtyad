@@ -1,3 +1,4 @@
 export default {
-  jwtSecret: "@QEGTUI"
+  ACCESS_TOKEN_SECRET: "123@HTO",
+  REFRESH_TOKEN_SECRET: "@QEGTUI",
 };
