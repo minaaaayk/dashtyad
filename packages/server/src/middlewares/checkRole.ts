@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import { IResponseType } from "../Shared";
 import { UserModel } from "./../models";
 
 
@@ -12,11 +13,23 @@ export const checkRole = (roles: Array<string>) => {
     try {
       user = await UserModel.findById(id);
     } catch (id) {
-      res.status(401).send();
+      const badRequest: IResponseType = {
+        message: 'user not found',
+        status: 409,
+        success: false,
+      };
+      res.status(badRequest.status).send(badRequest);
     }
 
     //Check if array of authorized roles includes the user's role
     if (roles.indexOf(user?.role) > -1) next();
-    else res.status(401).send();
+    else {
+      const unAuthorizedRequest: IResponseType = {
+        message: 'unAuthorized user',
+        status: 401,
+        success: false,
+      };
+      res.status(unAuthorizedRequest.status).send(unAuthorizedRequest);
+    }
   };
 };

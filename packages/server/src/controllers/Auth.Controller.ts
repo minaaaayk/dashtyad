@@ -2,10 +2,10 @@ import { User, UserModel, UserType } from "./../models";
 import {registerUserService} from "../services"
 import { Request, Response } from "express";
 import { jwtHelpers, redisHelpers } from "../helpers";
+import { IResponseType } from "../Shared";
 
 const login = async (req: Request, res: Response) => {
 
-  
    if (req.body) {
     try{
       const {
@@ -26,27 +26,36 @@ const login = async (req: Request, res: Response) => {
        await redisHelpers.SET(user.id, refreshToken);
         res.setHeader("refresh-token", refreshToken);
         res.setHeader("access-token", accessToken);
-
-        res.status(200)
-        .send({
-          message: "login  OK",
-          user,
-          accessToken,
-          refreshToken,
-        });
-
+        const successReq: IResponseType = {
+            message: 'change password successfully',
+            status: 200,
+            success: true,
+            response: user,
+            auth: {
+              userId: user.id,
+              refreshToken,
+              accessToken,
+            }
+        };
+        res.status(successReq.status);
+        res.send(successReq);
       } catch (error) {
-        res.status(409).send({
-          message: "login  Failed",
-          error,
-        });
+        const notFoundResponse: IResponseType = {
+          message: 'user not found',
+          status: 409,
+          success: false,
+        };
+        res.status(notFoundResponse.status).send(notFoundResponse);
       }
     }
     catch (error) {
-      res.status(400).send({
-        message: "invalid Arguments",
-        error,
-      });
+      const response: IResponseType = {
+        message: 'Internal Server Error.',
+        status: 501,
+        success: false,
+      };
+      res.status(response.status);
+      res.send(response);
     }
   }
 };
@@ -68,28 +77,39 @@ const register = async (req: Request, res: Response) => {
             user,
             refreshToken,
           } = await registerUserService(req.body);
-          res.setHeader("refresh-token", refreshToken);
-          res.setHeader("access-token", accessToken);
-          res.status(200)
-          .send({
-            message: "register  OK",
-            user,
-            accessToken,
-            refreshToken,
-          });
-          return;
+        res.setHeader("refresh-token", refreshToken);
+        res.setHeader("access-token", accessToken);
+        const successReq: IResponseType = {
+            message: 'register  OK',
+            status: 200,
+            success: true,
+            response: user,
+            auth: {
+              userId: user.id,
+              refreshToken,
+              accessToken,
+            }
+          };
+        res.status(successReq.status);
+        res.send(successReq);
+        return;
       } catch (error) {
-        res.status(409).send({
-            message: "register  Failed",
-            error: error.message,
-          });
+        const notFoundResponse: IResponseType = {
+          message: 'user not found',
+          status: 409,
+          success: false,
+        };
+        res.status(notFoundResponse.status).send(notFoundResponse);
       }
     }
     catch (error) {
-      res.status(400).send({
-        message: "Invalid arguments",
-        error,
-      });
+      const response: IResponseType = {
+        message: 'Internal Server Error.',
+        status: 501,
+        success: false,
+      };
+      res.status(response.status);
+      res.send(response);
     }
   }
 };
@@ -113,32 +133,43 @@ const changePassword = async (req: Request, res: Response)=>{
           encryptedPassword: user.password
         });
         if (!matched) {
-          res.status(401).send({
+          const badRequest: IResponseType = {
             message: 'password is not matched',
-          });
+            status: 401,
+            success: false,
+          };
+          res.status(badRequest.status);
+          res.send(badRequest);
           return;
         }
         const hashedPassword = await User.hashPassword(newPassword);
         user.password = hashedPassword;
         user.save();
-        res.status(200)
-        .send({
-          message: "pass  OK",
-          user,
-        });
-        
+        const successReq: IResponseType = {
+            message: 'change password successfully',
+            status: 201,
+            success: true,
+            response: user,
+        };
+        res.status(successReq.status);
+        res.send(successReq);
       } catch (error) {
-        res.status(409).send({
-          message: "user not found",
-          error,
-        });
+        const notFoundResponse: IResponseType = {
+          message: 'user not found',
+          status: 409,
+          success: false,
+        };
+        res.status(notFoundResponse.status).send(notFoundResponse);
       }
     }
     catch (error) {
-      res.status(400).send({
-        message: "changing password problem",
-        error,
-      });
+      const response: IResponseType = {
+        message: 'Internal Server Error.',
+        status: 501,
+        success: false,
+      };
+      res.status(response.status);
+      res.send(response);
     }
   }
 };

@@ -13,7 +13,7 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
     const { expired, match, tokens , user } =  await jwtServices(data);
     if (expired) {
       const expiredResponse: IResponseType = {
-        prettyMessage: 'Please log in again',
+        message: 'Please log in again',
         status: 405,
         success: false,
       };
@@ -24,7 +24,7 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
       //If token is not valid, respond with 401 (unauthorized)
     if (!match) {
       const badRequest: IResponseType = {
-        prettyMessage: 'Invalid Token',
+        message: 'Invalid Token',
         status: 401,
         success: false,
       };
@@ -38,7 +38,7 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
 
   } catch (err) {
     const response: IResponseType = {
-      prettyMessage: 'Internal Server Error.',
+      message: 'Internal Server Error.',
       status: 501,
       success: false,
     };

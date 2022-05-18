@@ -1,11 +1,11 @@
 export interface IResponseType {
-  prettyMessage: string;
+  message: string;
   status: number;
-  data?: {
+  auth?: {
     accessToken: string;
-    userId: string;
     refreshToken: string;
+    userId: string;
   };
+  response?: object; 
   success: boolean;
-  message?: string;
 }
