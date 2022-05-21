@@ -15,9 +15,9 @@ interface ICheckPassword {
 }
 
 export enum Gender {
-  male = 1,
-  female = 2,
-  unknown = 3,
+  male = "MALE",
+  female = "FEMALE",
+  unknown = "UNKNOWN",
 }
 
 
@@ -53,7 +53,7 @@ export class User implements Credentials {
   @prop({required: false, default: Role.Regular})
   public role: Role;
 
-  @prop({ enum: Gender, type: Number, default: Gender.unknown })
+  @prop({ enum: Gender,  default: Gender.unknown })
   public gender?: Gender;
 
   @prop({ required: false, ref: () => NoteBook, default: [] })
