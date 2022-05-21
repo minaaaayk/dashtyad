@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { IResponseType } from "../Shared";
-import { UserModel } from "./../models";
+import { Role, UserModel } from "./../models";
 
 
-export const checkRole = (roles: Array<string>) => {
+export const checkRole = (roles: Array<Role>) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+
     //Get the user ID from previous midleware
     const id = res.locals.jwtPayload.userId;
 
@@ -12,17 +13,22 @@ export const checkRole = (roles: Array<string>) => {
     let user = new UserModel();
     try {
       user = await UserModel.findById(id);
-    } catch (id) {
+    } catch (error) {
       const badRequest: IResponseType = {
-        message: 'user not found',
+        message: 'user not found ' + error.message,
         status: 409,
         success: false,
       };
       res.status(badRequest.status).send(badRequest);
+      
+      return;
     }
-
     //Check if array of authorized roles includes the user's role
-    if (roles.indexOf(user?.role) > -1) next();
+    if (roles.indexOf(user?.role) > -1) {
+      //Call the next middleware or controller
+      next();
+      return;
+    }
     else {
       const unAuthorizedRequest: IResponseType = {
         message: 'unAuthorized user',
@@ -30,6 +36,7 @@ export const checkRole = (roles: Array<string>) => {
         success: false,
       };
       res.status(unAuthorizedRequest.status).send(unAuthorizedRequest);
+      return;
     }
   };
 };

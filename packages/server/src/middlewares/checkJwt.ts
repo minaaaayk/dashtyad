@@ -45,7 +45,9 @@ export const checkJwt = async (req: Request, res: Response, next: NextFunction) 
 
     res.status(response.status);
     res.send(response);
+    return;
   }
+  
   //Call the next middleware or controller
   next();
 };
