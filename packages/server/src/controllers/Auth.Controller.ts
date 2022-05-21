@@ -36,7 +36,7 @@ const login = async (req: Request, res: Response) => {
         const authorizedResponse: IResponseType = {
           message: 'User Authorized.',
           status: 200,
-          success: false,
+          success: true,
           auth,
           response: user,
         };
@@ -45,7 +45,7 @@ const login = async (req: Request, res: Response) => {
     }
     catch (error) {
       const response: IResponseType = {
-        message: 'Internal Server Error.',
+        message: 'Internal Server Error' + error.message,
         status: 501,
         success: false,
       };
@@ -68,9 +68,9 @@ const register = async (req: Request, res: Response) => {
           throw (new Error('User already registered'));
         }
         const {
+            refreshToken,
             accessToken,
             user,
-            refreshToken,
           } = await registerUserService(req.body);
         res.setHeader("refresh-token", refreshToken);
         res.setHeader("access-token", accessToken);
@@ -90,7 +90,7 @@ const register = async (req: Request, res: Response) => {
         return;
       } catch (error) {
         const notFoundResponse: IResponseType = {
-          message: 'user not found',
+          message: 'user not found ' + error.message,
           status: 409,
           success: false,
         };
@@ -99,7 +99,7 @@ const register = async (req: Request, res: Response) => {
     }
     catch (error) {
       const response: IResponseType = {
-        message: 'Internal Server Error.',
+        message: 'Internal Server Error ' + error.message,
         status: 501,
         success: false,
       };
@@ -150,7 +150,7 @@ const changePassword = async (req: Request, res: Response)=>{
         res.send(successReq);
       } catch (error) {
         const notFoundResponse: IResponseType = {
-          message: 'user not found',
+          message: 'user not found ' + error.message,
           status: 409,
           success: false,
         };
@@ -159,7 +159,7 @@ const changePassword = async (req: Request, res: Response)=>{
     }
     catch (error) {
       const response: IResponseType = {
-        message: 'Internal Server Error.',
+        message: 'Internal Server Error ' + error.message,
         status: 501,
         success: false,
       };
@@ -186,9 +186,9 @@ const logout = async (req: Request, res: Response) => {
 
     res.status(response.status);
     res.send(response);
-  } catch (err) {
+  } catch (error) {
     const response: IResponseType = {
-      message: 'Internal Server Error.',
+      message: 'Internal Server Error ' + error.message,
       status: 501,
       success: false,
     };
