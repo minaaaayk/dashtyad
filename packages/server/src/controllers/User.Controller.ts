@@ -125,14 +125,18 @@ const Update_User =async (req: Request, res: Response) => {
   try {
     const user = await UserModel.findById(id); 
     if (user) {
-      const {username, email, gender, firstName, lastName, role} = req.body as UserType;
+      const {username, email, gender, firstName, lastName, role, password} = req.body as UserType;
       const existUser = await UserModel.findOne({  username  }) 
                 || await UserModel.findOne({  email  }); 
       if(existUser){
         throw (new Error('User already registered'));
       }
+      // Generating Password Hash
+      const hashedPassword = password && await User.hashPassword(password);
+
       user.username = username || user.username;
       user.email = email || user.email;
+      user.password = hashedPassword || user.password
       user.gender = gender || user.gender;
       user.role = role || user.role;
       user.firstName = firstName ?? user.firstName;
