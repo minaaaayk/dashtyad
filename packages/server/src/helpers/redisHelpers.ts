@@ -3,10 +3,12 @@ import redisClient from './redis/redisClientLoader';
 
 
 const SET = async (key: string, value: string) => {
-  const res = await redisClient.set(key, value);
-  return new Promise((resolve, reject) =>
-    res !== 'OK' ? reject(new Error('REDIS SET FAILED')) : resolve(res),
-  );
+  try{
+    const res = await redisClient.set(key, value);
+    return new Promise((resolve) => resolve(res) );
+  } catch(e) {  
+    return new Promise((_, reject) => reject(new Error('REDIS SET FAILED')));
+  }
 };
 
 const GET = async (key: string) => {
@@ -19,10 +21,12 @@ const GET = async (key: string) => {
 };
 
 const DELETE = async (key: string) => {
-  const val = redisClient.del(key);
-  return new Promise((resolve, reject) =>
-    !val ? reject(new Error('REDIS DELETE FAILED')) : resolve(val),
-  );
+   try{
+    const val = redisClient.del(key);
+    return new Promise((resolve) => resolve(val));
+  } catch(e) {  
+    return new Promise((_, reject) => reject(new Error('REDIS DELETE FAILED')));
+  }
 };
 
 export { SET, GET, DELETE };

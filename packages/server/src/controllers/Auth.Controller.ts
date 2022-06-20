@@ -90,7 +90,7 @@ const register = async (req: Request, res: Response) => {
         return;
       } catch (error) {
         const notFoundResponse: IResponseType = {
-          message: 'user not found ' + error.message,
+          message: 'error on: ' + error.message,
           status: 409,
           success: false,
         };

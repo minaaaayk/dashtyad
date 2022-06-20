@@ -4,7 +4,7 @@ import { router } from "./routes/router";
 import DbConnector from "./DbConnector";
 import cors from "cors";
 import helmet from "helmet";
-import redisClient from "./helpers/redis/redisClientLoader";
+// import redisClient from "./helpers/redis/redisClientLoader";
 
 const app: Application = express();
 
@@ -12,14 +12,14 @@ const app: Application = express();
 app.use(cors());
 app.use(helmet());
 app.use(bodyParser.json());
-redisClient.connect();
+// redisClient.connect();
 
 
-const PORT = process.env.port || 6002;
+const PORT = process.env.port || 6000;
 app.listen(PORT, () => {
   console.log("Express server listening on port 127.0.0.1:" + PORT);
 });
 
 router(app);
-const dbURL = "mongodb://localhost:27017/dashtyad";
+const dbURL = "mongodb://mongo:27017/dashtyad";
 DbConnector(dbURL);
